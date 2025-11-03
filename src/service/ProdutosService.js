@@ -1,5 +1,5 @@
 import {
-    produtosCollection,
+    collection,
     addDoc,
     doc,
     getDoc,
@@ -10,10 +10,11 @@ import {
     updateDoc,
     deleteDoc,
     serverTimestamp,
-    db
-} from "./firebaseConnections";
+} from "firebase/firestore";
 
-import {collection} from "firebase/firestore";
+import { db } from "./firebaseConnections";
+const produtosCollection = collection(db, "produtos");
+
 
 //Criar produto
 export const criarProduto = async (produto) =>{
@@ -29,7 +30,7 @@ export const criarProduto = async (produto) =>{
 
 //ler todos (snapshot em tempo real)
 export const subscribeProdutos = (callback) => {
-    const q = query(produtosCollection, orderBy("createAt", "desc"));
+    const q = query(produtosCollection, orderBy("createdAt", "desc"));
     return onSnapshot(q, (snapshot)=>{
         const itens = snapshot.docs.map((d) => ({id: d.id, ...d.data()}));
         callback(itens);
@@ -39,7 +40,7 @@ export const subscribeProdutos = (callback) => {
 //ler todos
 export const obterProdutos = async () => {
     const snap = await getDocs (produtosCollection);
-    return snap.docs.map((d) => ({id: d.id, ...d.data}));
+    return snap.docs.map((d) => ({id: d.id, ...d.data()}));
 };
 
 //ler um por id
@@ -51,7 +52,7 @@ export const obterProdutosPorId = async (id) =>{
 };
 
 //Atualizar
-export const atualizarproduto = async (id, dados) =>{
+export const atualizarpPoduto = async (id, dados) =>{
     const docRef = doc(db, "produtos", id);
     await updateDoc(docRef, { ...dados, updatedAt: serverTimestamp()});
 };
@@ -63,3 +64,7 @@ export const deletarProduto = async (id) => {
 };
 
 
+//Correções feitas
+//linha 32  const q = query(produtosCollection, orderBy("createdAt", "desc"));(createdAt)
+//linha 42 return snap.docs.map((d) => ({id: d.id, ...d.data()})); (data())
+//Corrigir imports

@@ -1,5 +1,6 @@
 import { Alert, Button, Platform, StyleSheet, Text, TextInput, View } from "react-native";
-import React, {useState} from "react";
+import React, {useState, } from "react";
+import { criarProduto } from "../service/ProdutosService";
 
 
 export default function CadastroScreen() {
@@ -8,7 +9,7 @@ export default function CadastroScreen() {
     const [descricao, setDescricao] = useState("");
 
 
-    const handlerCadastro = () =>{
+    const handlerCadastro = async () =>{
       if (nome==="" || preco==="" || descricao===""){
         Platform.OS ==="web"
         ? window.alert("Por favor, preencha todos os campos.")
@@ -24,15 +25,14 @@ export default function CadastroScreen() {
         return;
     }
 
-    const novoProduto={
-      id: Math.random().toString(),
+    const novo={
       nome,
       preco: precoConvertido,
       descricao,
     };
 
-    adicionarProduto(novoProduto);
-
+   try {
+      const id = await criarProduto(novo);
     Platform.OS ==="web"
     ? window.alert("Produto cadastrado com sucesso!")
     :Alert.alert("Sucesso!", "Produto cadastrado com sucesso!");
@@ -40,6 +40,13 @@ export default function CadastroScreen() {
     setNome("");
     setPreco("");
     setDescricao("");
+
+   }catch (error){ 
+    console.error("Erro ao cadastrar produto", error);
+     Platform.OS ==="web"
+    ? window.alert("Erro ao cadastrar produto. Tente novamente")
+    :Alert.alert("Erro!", "Erro ao cadastrar produto. Tente novamente");
+   }
   };
     return (
 

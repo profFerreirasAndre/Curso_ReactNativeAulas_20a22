@@ -15,6 +15,9 @@ import {
     serverTimestamp
 } from "firebase/firestore";
 
+// IMPORTANTE: Adicionar autenticação
+import { getAuth, signInAnonymously } from "firebase/auth";
+
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDRWyMaFowzUdoYGeWPGCP_tkS3YcxReUc",
@@ -28,6 +31,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app); // Inicializa autenticação
+
+ //CORREÇÃO: CHAMADA DA FUNÇÃO DE AUTENTICAÇÃO AGORA ESTÁ PRESENTE
+// ************************************************************
+signInAnonymously(auth).then(() => {
+    console.log("SUCESSO: Usuário logado anonimamente. O Firestore deve funcionar.");
+}).catch((error) => {
+    // Isso deve alertar se o Firebase Auth não estiver habilitado para seu projeto.
+    console.error("ERRO CRÍTICO: Não foi possível logar anonimamente. Verifique se o Firebase Auth (Login Anônimo) está habilitado.", error);
+});
+
 
 const produtosCollection = collection(db, "produtos");
 
