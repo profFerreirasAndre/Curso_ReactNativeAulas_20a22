@@ -1,29 +1,42 @@
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from "react-native";
-import { ProdutosContext } from "../components/ProdutosContext";
-import { useContext } from "react";
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
+import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
+import {subscribeProdutos} from "../service/ProdutosService";
 
 export default function ListaScreen() {
-  const {listaDeProdutos} = useContext(ProdutosContext)
   const navigation =useNavigation();
+  const [produtos, setProdutos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+useEffect(()=>{
+  const unsubscribe = subscribeProdutos((itens) =>{
+    setProdutos(itens);
+    setLoading(false);
+  }, (err) =>{
+    console.error(err);
+    setLoading(false);
+});
+return () => unsubscribe();
+}, []);
 
   const renderItem =({item}) =>(
     <TouchableOpacity
     style = {styles.itemContainer}
-    onPress={()=>{navigation.navigate('Detalhes', {produto:item}); }}
+    onPress={()=>{navigation.navigate('Detalhes', {idProduto:item.id}); }}
     >
       <Text style={styles.produto}>Produto: {item.nome}</Text>
       <Text style={styles.precoproduto}>Preço R$: {item.preco.toFixed(2)}</Text>
       <Text style={styles.precoproduto}>Descrição: {item.descricao}</Text>
     </TouchableOpacity>
   );
-  
-    return (
+
+  if (loading) return<ActivityIndicator style={{flex:1}} size = "large"/>;
+      return (
       <View style={styles.container}>
         <Text style={styles.title}>Meus Produtos</Text>
-        {listaDeProdutos.length >0?(
+        {produtos.length >0?(
           <FlatList
-          data={listaDeProdutos}
+          data={produtos}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}   
           />
